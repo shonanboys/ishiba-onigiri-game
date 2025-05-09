@@ -389,13 +389,13 @@ startBtn.addEventListener("click", function () {
 
 function resizeCanvas() {
   // 画面の幅・高さを取得
-  const w = window.innerWidth;
-  const h = window.innerHeight;
+  const w = window.innerWidth - 16; // 左右に8pxずつ余裕
+  const h = window.innerHeight * 0.9; // 画面高さいっぱいにしない
   // アスペクト比2:3を維持しつつ、画面に収める
-  let canvasWidth = w;
-  let canvasHeight = w * 1.5; // 2:3
-  if (canvasHeight > h - 60) { // タイトルやボタン分を少し引く
-    canvasHeight = h - 60;
+  let canvasWidth = w > 400 ? 400 : w;
+  let canvasHeight = canvasWidth * 1.5; // 2:3
+  if (canvasHeight > h - 120) { // タイトルやボタン分を多めに引く
+    canvasHeight = h - 120;
     canvasWidth = canvasHeight / 1.5;
   }
   canvas.width = canvasWidth;
