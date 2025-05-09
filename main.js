@@ -371,11 +371,12 @@ canvas.addEventListener("mousemove", function (e) {
 });
 canvas.addEventListener("touchmove", function (e) {
   if (!isGameRunning) return;
+  e.preventDefault();
   const rect = canvas.getBoundingClientRect();
   const touch = e.touches[0];
   ishibaX = touch.clientX - rect.left;
   ishibaY = touch.clientY - rect.top;
-});
+}, { passive: false });
 
 // --- スタートボタン ---
 startBtn.addEventListener("click", function () {
@@ -385,3 +386,12 @@ startBtn.addEventListener("click", function () {
   gameLoop();
   startTimer();
 });
+
+function resizeCanvas() {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  canvas.width = w > 400 ? 400 : w;
+  canvas.height = h > 600 ? 600 : h;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
