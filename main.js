@@ -388,10 +388,18 @@ startBtn.addEventListener("click", function () {
 });
 
 function resizeCanvas() {
+  // 画面の幅・高さを取得
   const w = window.innerWidth;
   const h = window.innerHeight;
-  canvas.width = w > 400 ? 400 : w;
-  canvas.height = h > 600 ? 600 : h;
+  // アスペクト比2:3を維持しつつ、画面に収める
+  let canvasWidth = w;
+  let canvasHeight = w * 1.5; // 2:3
+  if (canvasHeight > h - 60) { // タイトルやボタン分を少し引く
+    canvasHeight = h - 60;
+    canvasWidth = canvasHeight / 1.5;
+  }
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
 }
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
