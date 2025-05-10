@@ -409,29 +409,13 @@ startBtn.addEventListener("click", function () {
 function resizeCanvasAndTitle() {
   const parent = canvas.parentElement;
   const parentWidth = parent.offsetWidth;
-  const scoreBoard = document.getElementById('score-board');
-  const startBtn = document.getElementById('start-btn');
   const h1 = document.getElementById('game-title');
   // タイトルのフォントサイズを親要素の幅に応じて設定
   h1.style.fontSize = Math.max(20, Math.min(parentWidth * 0.08, 32)) + "px";
 
-  // UIの高さを取得
-  const scoreBoardHeight = scoreBoard ? scoreBoard.offsetHeight : 40;
-  const startBtnHeight = startBtn ? startBtn.offsetHeight : 50;
-  const h1Height = h1 ? h1.offsetHeight : 40;
-  const margin = 80; // 余白をさらに増やす
-
-  // 利用可能な高さ
-  const availableHeight = window.innerHeight - (scoreBoardHeight + startBtnHeight + h1Height + margin);
-
-  // 幅を基準に高さを決める（2:2でかなり低めに）
+  // 幅を基準に高さを決める（2:2.2でかなり低めに）
   let canvasWidth = Math.min(parentWidth, 400);
-  let canvasHeight = canvasWidth; // 2:2（正方形に近い）
-  // 高さが足りなければ縮める
-  if (canvasHeight > availableHeight * 0.8) { // availableHeightの80%まで
-    canvasHeight = availableHeight * 0.8;
-    canvasWidth = canvasHeight; // 2:2
-  }
+  let canvasHeight = canvasWidth * 1.1; // 2:2.2
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
   canvas.style.width = canvasWidth + "px";
