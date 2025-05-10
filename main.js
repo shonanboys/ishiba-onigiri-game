@@ -333,6 +333,20 @@ for (let i = 0; i < bigOnigiris.length; i++) {
     spawnOnigiri();
   }
 
+  // --- 石破アイコンの自動移動 ---
+  if (targetX !== null && targetY !== null) {
+    const dx = targetX - ishibaX;
+    const dy = targetY - ishibaY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > ISHIBA_MOVE_SPEED) {
+      ishibaX += (dx / dist) * ISHIBA_MOVE_SPEED;
+      ishibaY += (dy / dist) * ISHIBA_MOVE_SPEED;
+    } else {
+      ishibaX = targetX;
+      ishibaY = targetY;
+    }
+  }
+
   animationId = requestAnimationFrame(gameLoop);
 }
 
@@ -378,6 +392,11 @@ canvas.addEventListener("touchmove", function (e) {
   ishibaY = touch.clientY - rect.top;
 }, { passive: false });
 
+canvas.addEventListener("touchend", function (e) {
+  ishibaX = null;
+  ishibaY = null;
+}, { passive: false });
+
 // --- スタートボタン ---
 startBtn.addEventListener("click", function () {
   resetGame();
@@ -389,17 +408,20 @@ startBtn.addEventListener("click", function () {
 
 function resizeCanvas() {
   // 画面の幅・高さを取得
-  const w = window.innerWidth - 16; // 左右に8pxずつ余裕
-  const h = window.innerHeight * 0.9; // 画面高さいっぱいにしない
-  // アスペクト比2:3を維持しつつ、画面に収める
-  let canvasWidth = w > 400 ? 400 : w;
-  let canvasHeight = canvasWidth * 1.5; // 2:3
-  if (canvasHeight > h - 120) { // タイトルやボタン分を多めに引く
-    canvasHeight = h - 120;
-    canvasWidth = canvasHeight / 1.5;
+  const w = Math.min(window.innerWidth * 0.96, 400); // 横幅に余裕
+  const availableHeight = window.innerHeight - 180; // タイトル・スコア・ボタン分を多めに引く
+  let canvasHeight = Math.min(w * 1.5, availableHeight, 500); // 2:3比率、最大500px
+  let canvasWidth = canvasHeight / 1.5;
+  if (canvasWidth > w) {
+    canvasWidth = w;
+    canvasHeight = canvasWidth * 1.5;
   }
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
 }
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
+
+let targetX = null;
+let targetY = null;
+const ISHIBA_MOVE_SPEED = 8; // 1フレームあたりの最大移動量（調整可）
