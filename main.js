@@ -409,26 +409,9 @@ startBtn.addEventListener("click", function () {
 function resizeCanvas() {
   const parent = canvas.parentElement;
   const parentWidth = parent.offsetWidth;
-  // UIの高さを取得
-  const scoreBoard = document.getElementById('score-board');
-  const startBtn = document.getElementById('start-btn');
-  const h1 = parent.querySelector('h1');
-  const scoreBoardHeight = scoreBoard ? scoreBoard.offsetHeight : 40;
-  const startBtnHeight = startBtn ? startBtn.offsetHeight : 50;
-  const h1Height = h1 ? h1.offsetHeight : 40;
-  const margin = 40; // 余白
-
-  // 利用可能な高さ
-  const availableHeight = window.innerHeight - (scoreBoardHeight + startBtnHeight + h1Height + margin);
-
-  // 幅を基準に高さを決める（2:3）
+  // 幅を基準に高さを決める（2:2.6でやや低め）
   let canvasWidth = Math.min(parentWidth, 400);
-  let canvasHeight = canvasWidth * 1.5;
-  // 高さが足りなければ縮める
-  if (canvasHeight > availableHeight) {
-    canvasHeight = availableHeight;
-    canvasWidth = canvasHeight / 1.5;
-  }
+  let canvasHeight = canvasWidth * 1.3; // 2:2.6
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
   canvas.style.width = canvasWidth + "px";
