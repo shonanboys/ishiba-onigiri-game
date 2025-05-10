@@ -407,17 +407,18 @@ startBtn.addEventListener("click", function () {
 });
 
 function resizeCanvas() {
-  // 親要素の幅を取得
   const parent = canvas.parentElement;
   const parentWidth = parent.offsetWidth;
-  // 画面の高さから下のUI分を引く
+  // UIの高さを取得
   const scoreBoard = document.getElementById('score-board');
   const startBtn = document.getElementById('start-btn');
-  const h1 = document.querySelector('h1');
+  const h1 = parent.querySelector('h1');
   const scoreBoardHeight = scoreBoard ? scoreBoard.offsetHeight : 40;
   const startBtnHeight = startBtn ? startBtn.offsetHeight : 50;
   const h1Height = h1 ? h1.offsetHeight : 40;
-  const margin = 32;
+  const margin = 40; // 余白
+
+  // 利用可能な高さ
   const availableHeight = window.innerHeight - (scoreBoardHeight + startBtnHeight + h1Height + margin);
 
   // 幅を基準に高さを決める（2:3）
