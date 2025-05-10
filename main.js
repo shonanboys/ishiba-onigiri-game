@@ -413,9 +413,9 @@ function resizeCanvasAndTitle() {
   // タイトルのフォントサイズを親要素の幅に応じて設定
   h1.style.fontSize = Math.max(20, Math.min(parentWidth * 0.08, 32)) + "px";
 
-  // 幅を基準に高さを決める（2:2.2でかなり低めに）
+  // 幅を基準に高さを決める（1:1.1でかなり低めに）
   let canvasWidth = Math.min(parentWidth, 400);
-  let canvasHeight = canvasWidth * 1.1; // 2:2.2
+  let canvasHeight = canvasWidth * 1.1;
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
   canvas.style.width = canvasWidth + "px";
