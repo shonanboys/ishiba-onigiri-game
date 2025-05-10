@@ -28,6 +28,9 @@ h1 {
   border-radius: 0 0 16px 16px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
   padding: 0 0 16px 0;
+  height: 92vh; /* 画面の92%以内に制限 */
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 #game-canvas {

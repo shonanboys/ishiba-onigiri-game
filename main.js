@@ -393,8 +393,8 @@ canvas.addEventListener("touchmove", function (e) {
 }, { passive: false });
 
 canvas.addEventListener("touchend", function (e) {
-  ishibaX = null;
-  ishibaY = null;
+  targetX = null;
+  targetY = null;
 }, { passive: false });
 
 // --- スタートボタン ---
@@ -407,10 +407,22 @@ startBtn.addEventListener("click", function () {
 });
 
 function resizeCanvas() {
-  // 画面の幅・高さを取得
-  const w = Math.min(window.innerWidth * 0.96, 400); // 横幅に余裕
-  const availableHeight = window.innerHeight - 180; // タイトル・スコア・ボタン分を多めに引く
-  let canvasHeight = Math.min(w * 1.5, availableHeight, 500); // 2:3比率、最大500px
+  // #game-areaの高さを取得（またはwindow.innerHeightの90%など）
+  const gameArea = document.getElementById('game-area');
+  const areaHeight = window.innerHeight * 0.92; // 画面の92%以内
+  gameArea.style.height = areaHeight + "px";
+
+  // スコアボードとボタンの高さを取得
+  const scoreBoard = document.getElementById('score-board');
+  const startBtn = document.getElementById('start-btn');
+  const scoreBoardHeight = scoreBoard ? scoreBoard.offsetHeight : 40;
+  const startBtnHeight = startBtn ? startBtn.offsetHeight : 50;
+  const hMargin = 32; // タイトルや余白分
+
+  // canvasの最大高さを計算
+  const maxCanvasHeight = areaHeight - scoreBoardHeight - startBtnHeight - hMargin;
+  const w = Math.min(window.innerWidth * 0.96, 400);
+  let canvasHeight = Math.min(w * 1.5, maxCanvasHeight, 500);
   let canvasWidth = canvasHeight / 1.5;
   if (canvasWidth > w) {
     canvasWidth = w;
