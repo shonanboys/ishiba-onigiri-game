@@ -419,18 +419,18 @@ function resizeCanvasAndTitle() {
   const scoreBoardHeight = scoreBoard ? scoreBoard.offsetHeight : 40;
   const startBtnHeight = startBtn ? startBtn.offsetHeight : 50;
   const h1Height = h1 ? h1.offsetHeight : 40;
-  const margin = 56; // 余白
+  const margin = 80; // 余白をさらに増やす
 
   // 利用可能な高さ
   const availableHeight = window.innerHeight - (scoreBoardHeight + startBtnHeight + h1Height + margin);
 
-  // 幅を基準に高さを決める（2:3）
+  // 幅を基準に高さを決める（2:2でかなり低めに）
   let canvasWidth = Math.min(parentWidth, 400);
-  let canvasHeight = canvasWidth * 1.5;
+  let canvasHeight = canvasWidth; // 2:2（正方形に近い）
   // 高さが足りなければ縮める
-  if (canvasHeight > availableHeight) {
-    canvasHeight = availableHeight;
-    canvasWidth = canvasHeight / 1.5;
+  if (canvasHeight > availableHeight * 0.8) { // availableHeightの80%まで
+    canvasHeight = availableHeight * 0.8;
+    canvasWidth = canvasHeight; // 2:2
   }
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
