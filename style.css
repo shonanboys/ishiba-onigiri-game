@@ -9,14 +9,12 @@ body {
   background: #f0f0f0;
   font-family: 'Segoe UI', 'Meiryo', sans-serif;
   text-align: center;
-  margin: 0;
-  padding: 0;
 }
 
 h1 {
   margin: 8px 0 16px 0;
   color: #333;
-  font-size: clamp(20px, 6vw, 36px); /* 最小20px、推奨6vw、最大36px */
+  font-size: clamp(20px, 8vw, 36px);
   line-height: 1.1;
 }
 
@@ -28,9 +26,7 @@ h1 {
   border-radius: 0 0 16px 16px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
   padding: 0 0 16px 0;
-  height: 92vh; /* 画面の92%以内に制限 */
   box-sizing: border-box;
-  overflow: hidden;
 }
 
 #game-canvas {

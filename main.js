@@ -407,29 +407,31 @@ startBtn.addEventListener("click", function () {
 });
 
 function resizeCanvas() {
-  // #game-areaの高さを取得（またはwindow.innerHeightの90%など）
-  const gameArea = document.getElementById('game-area');
-  const areaHeight = window.innerHeight * 0.92; // 画面の92%以内
-  gameArea.style.height = areaHeight + "px";
-
-  // スコアボードとボタンの高さを取得
+  // 親要素の幅を取得
+  const parent = canvas.parentElement;
+  const parentWidth = parent.offsetWidth;
+  // 画面の高さから下のUI分を引く
   const scoreBoard = document.getElementById('score-board');
   const startBtn = document.getElementById('start-btn');
+  const h1 = document.querySelector('h1');
   const scoreBoardHeight = scoreBoard ? scoreBoard.offsetHeight : 40;
   const startBtnHeight = startBtn ? startBtn.offsetHeight : 50;
-  const hMargin = 32; // タイトルや余白分
+  const h1Height = h1 ? h1.offsetHeight : 40;
+  const margin = 32;
+  const availableHeight = window.innerHeight - (scoreBoardHeight + startBtnHeight + h1Height + margin);
 
-  // canvasの最大高さを計算
-  const maxCanvasHeight = areaHeight - scoreBoardHeight - startBtnHeight - hMargin;
-  const w = Math.min(window.innerWidth * 0.96, 400);
-  let canvasHeight = Math.min(w * 1.5, maxCanvasHeight, 500);
-  let canvasWidth = canvasHeight / 1.5;
-  if (canvasWidth > w) {
-    canvasWidth = w;
-    canvasHeight = canvasWidth * 1.5;
+  // 幅を基準に高さを決める（2:3）
+  let canvasWidth = Math.min(parentWidth, 400);
+  let canvasHeight = canvasWidth * 1.5;
+  // 高さが足りなければ縮める
+  if (canvasHeight > availableHeight) {
+    canvasHeight = availableHeight;
+    canvasWidth = canvasHeight / 1.5;
   }
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
+  canvas.style.width = canvasWidth + "px";
+  canvas.style.height = canvasHeight + "px";
 }
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
