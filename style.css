@@ -1,71 +1,117 @@
-html, body {
-  height: 100%;
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
   overflow: hidden;
+  touch-action: none;
+  position: fixed;
+  width: 100%;
 }
 
 body {
   background: #f0f0f0;
   font-family: 'Segoe UI', 'Meiryo', sans-serif;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-h1 {
-  margin: 8px 0 16px 0;
+.game-container {
+  width: 100%;
+  height: 100%;
+  max-width: 800px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+#game-title {
   color: #333;
-  font-size: clamp(20px, 8vw, 36px);
-  line-height: 1.1;
+  text-align: center;
+  margin: 5px 0;
+  font-size: clamp(16px, 4vw, 24px);
+  line-height: 1.2;
+  flex-shrink: 0;
 }
 
 #game-area {
-  margin: 0 auto;
-  width: 96vw;
-  max-width: 420px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   background: #fff;
-  border-radius: 0 0 16px 16px;
+  border-radius: 16px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-  padding: 0 0 16px 0;
-  box-sizing: border-box;
+  padding: 10px;
+  min-height: 0;
+  margin-bottom: 5px;
+  position: relative;
 }
 
 #game-canvas {
+  width: 100%;
+  height: 100%;
   background: #e0f7fa;
   border: 2px solid #0097a7;
   border-radius: 8px;
-  display: block;
-  margin: 0 auto 8px auto;
-  width: 100%;
-  max-width: 400px;
-  height: auto;
-  aspect-ratio: 2/3;
   touch-action: none;
+  object-fit: contain;
+}
+
+#game-ui {
+  padding: 5px 0;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 #score-board {
-  font-size: 1.2em;
-  margin-bottom: 20px;
+  font-size: clamp(14px, 3.5vw, 20px);
+  margin-bottom: 10px;
   color: #444;
 }
 
 #start-btn {
-  font-size: 1.1em;
-  padding: 10px 30px;
+  font-size: clamp(14px, 3.5vw, 18px);
+  padding: 6px 20px;
   background: #0097a7;
   color: #fff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #start-btn:hover {
   background: #00796b;
 }
 
-#game-area h1 {
-  margin: 8px 0 16px 0;
-  color: #333;
-  font-size: clamp(20px, 8vw, 36px); /* 最小20px、推奨8vw、最大36px */
-  line-height: 1.1;
+#start-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+@media (max-height: 600px) {
+  .game-container {
+    padding: 5px;
+  }
+  
+  #game-area {
+    padding: 5px;
+  }
+  
+  #game-title {
+    margin: 2px 0;
+  }
+  
+  #game-ui {
+    padding: 2px 0;
+  }
+  
+  #score-board {
+    margin-bottom: 5px;
+  }
 }

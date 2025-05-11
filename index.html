@@ -4,18 +4,22 @@
   <meta charset="UTF-8">
   <title>石破おにぎりキャッチゲーム</title>
   <link rel="stylesheet" href="style.css">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
 <body>
-  <h1>石破おにぎりキャッチゲーム</h1>
-  <div id="game-area">
-    <canvas id="game-canvas" width="400" height="600"></canvas>
-    <div id="score-board">
-      スコア: <span id="score">0</span>
-      <br>
-      残り時間: <span id="timer">30</span>秒
+  <div class="game-container">
+    <h1 id="game-title">石破おにぎりキャッチゲーム</h1>
+    <div id="game-area">
+      <canvas id="game-canvas"></canvas>
+      <div id="game-ui">
+        <div id="score-board">
+          スコア: <span id="score">0</span>
+          <br>
+          残り時間: <span id="timer">30</span>秒
+        </div>
+        <button id="start-btn">スタート</button>
+      </div>
     </div>
-    <button id="start-btn">スタート</button>
   </div>
   <script src="main.js"></script>
 </body>

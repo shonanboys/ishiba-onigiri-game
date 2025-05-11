@@ -4,45 +4,74 @@ const startBtn = document.getElementById("start-btn");
 const scoreSpan = document.getElementById("score");
 const timerSpan = document.getElementById("timer");
 
-const GAME_WIDTH = canvas.width;
-const GAME_HEIGHT = canvas.height;
-const ISHIBA_SIZE = 100;
-const ONIGIRI_SIZE = 40;
-const BIG_ONIGIRI_SIZE = ONIGIRI_SIZE * 3;
-const KISHIDA_SIZE = 90;
-const GAME_TIME = 30; // 秒
+let GAME_WIDTH = 400;
+let GAME_HEIGHT = 440;
+const GAME_TIME = 30;
+let ISHIBA_SIZE, ONIGIRI_SIZE, BIG_ONIGIRI_SIZE, KISHIDA_SIZE;
 
-const bgImg = new Image();
-bgImg.src = "background.png"; // 国会議事堂の画像ファイル名
-let bgLoaded = false;
-bgImg.onload = function() {
-  bgLoaded = true;
-};
-
+// ゲームの状態管理
 let isGameRunning = false;
 let score = 0;
 let timer = GAME_TIME;
 let onigiris = [];
 let kishidas = [];
 let bigOnigiris = [];
-let ishibaX = GAME_WIDTH / 2;
-let ishibaY = GAME_HEIGHT - ISHIBA_SIZE / 2 - 10;
+let ishibaX = 0;
+let ishibaY = 0;
 let animationId = null;
 let timerId = null;
 let spitAnimations = [];
-
-// 出現タイミング管理
-let kishidaSchedule = [];
-let bigOnigiriSchedule = [];
 let kishidaSpawned = 0;
 let bigOnigiriSpawned = 0;
+let kishidaSchedule = [];
+let bigOnigiriSchedule = [];
+
+// 画像の設定
+const bgImg = new Image();
+bgImg.src = "background.jpg";
 
 const ishibaImg = new Image();
 ishibaImg.src = "ishiba.png";
+
 const onigiriImg = new Image();
 onigiriImg.src = "onigiri.png";
+
 const kishidaImg = new Image();
 kishidaImg.src = "kishida.png";
+
+function initializeGameDimensions() {
+  const container = document.getElementById("game-area");
+  const containerWidth = container.clientWidth - 20;
+  const containerHeight = container.clientHeight - document.getElementById("game-ui").clientHeight - 20;
+  
+  const aspectRatio = 16/9;
+  if (containerWidth / containerHeight > aspectRatio) {
+    GAME_HEIGHT = containerHeight;
+    GAME_WIDTH = GAME_HEIGHT * aspectRatio;
+  } else {
+    GAME_WIDTH = containerWidth;
+    GAME_HEIGHT = GAME_WIDTH / aspectRatio;
+  }
+
+  canvas.width = GAME_WIDTH;
+  canvas.height = GAME_HEIGHT;
+
+  ISHIBA_SIZE = Math.min(GAME_WIDTH, GAME_HEIGHT) * 0.15;
+  ONIGIRI_SIZE = ISHIBA_SIZE * 0.4;
+  BIG_ONIGIRI_SIZE = ONIGIRI_SIZE * 3;
+  KISHIDA_SIZE = ISHIBA_SIZE * 0.9;
+
+  ishibaX = GAME_WIDTH / 2;
+  ishibaY = GAME_HEIGHT - ISHIBA_SIZE / 2 - 10;
+}
+
+window.addEventListener('resize', initializeGameDimensions);
+initializeGameDimensions();
+
+let bgLoaded = false;
+bgImg.onload = function() {
+  bgLoaded = true;
+};
 
 let imagesLoaded = 0;
 function checkImagesLoaded() {
@@ -52,11 +81,11 @@ function checkImagesLoaded() {
     startBtn.disabled = false;
   }
 }
+
 ishibaImg.onload = checkImagesLoaded;
 onigiriImg.onload = checkImagesLoaded;
 kishidaImg.onload = checkImagesLoaded;
 
-// --- 石破茂の初期描画 ---
 function drawIshiba() {
   ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
   ctx.drawImage(
@@ -68,9 +97,6 @@ function drawIshiba() {
   );
 }
 
-// ... 省略（前半は同じ） ...
-
-// --- onigiri生成（ishibaを狙う軌道＋速度ランダム＋少しブレ） ---
 function spawnOnigiri() {
   let x, y;
   const edge = Math.floor(Math.random() * 4);
@@ -87,7 +113,7 @@ function spawnOnigiri() {
     x = -ONIGIRI_SIZE;
     y = Math.random() * (GAME_HEIGHT - ONIGIRI_SIZE);
   }
-  // ishbaの現在位置を狙う＋少しブレ
+  
   const targetX = ishibaX + (Math.random() - 0.5) * 80;
   const targetY = ishibaY + (Math.random() - 0.5) * 80;
   const dx0 = targetX - x;
@@ -96,10 +122,10 @@ function spawnOnigiri() {
   const speed = 2 + Math.random() * 3;
   const dx = (dx0 / norm) * speed;
   const dy = (dy0 / norm) * speed;
+  
   onigiris.push({ x, y, dx, dy, caught: false });
 }
 
-// --- kishida生成（ishibaを狙う軌道＋速度ランダム＋少しブレ） ---
 function spawnKishida() {
   let x, y;
   const edge = Math.floor(Math.random() * 4);
@@ -116,6 +142,7 @@ function spawnKishida() {
     x = -KISHIDA_SIZE;
     y = Math.random() * (GAME_HEIGHT - KISHIDA_SIZE);
   }
+  
   const targetX = ishibaX + (Math.random() - 0.5) * 80;
   const targetY = ishibaY + (Math.random() - 0.5) * 80;
   const dx0 = targetX - x;
@@ -124,10 +151,10 @@ function spawnKishida() {
   const speed = 2 + Math.random() * 3;
   const dx = (dx0 / norm) * speed;
   const dy = (dy0 / norm) * speed;
+  
   kishidas.push({ x, y, dx, dy, touched: false });
 }
 
-// --- 大きいonigiri生成（ishibaを狙う軌道＋速度ランダム＋不規則な動き） ---
 function spawnBigOnigiri() {
   let x, y;
   const edge = Math.floor(Math.random() * 4);
@@ -144,6 +171,7 @@ function spawnBigOnigiri() {
     x = -BIG_ONIGIRI_SIZE;
     y = Math.random() * (GAME_HEIGHT - BIG_ONIGIRI_SIZE);
   }
+  
   const targetX = ishibaX + (Math.random() - 0.5) * 80;
   const targetY = ishibaY + (Math.random() - 0.5) * 80;
   const dx0 = targetX - x;
@@ -153,25 +181,10 @@ function spawnBigOnigiri() {
   const dx = (dx0 / norm) * speed;
   const dy = (dy0 / norm) * speed;
   const randomSeed = Math.random() * 10000;
+  
   bigOnigiris.push({ x, y, dx, dy, caught: false, t: 0, randomSeed });
 }
 
-// --- 大きいonigiriの不規則な動き（gameLoop内） ---
-for (let i = 0; i < bigOnigiris.length; i++) {
-  const b = bigOnigiris[i];
-  if (!b.caught) {
-    b.t += 1;
-    const freq = 0.05 + (b.randomSeed % 0.03);
-    // 軌道にブレを加える
-    b.x += b.dx + Math.sin(b.t * freq + b.randomSeed) * 4;
-    b.y += b.dy + Math.cos(b.t * freq + b.randomSeed) * 4;
-    ctx.drawImage(onigiriImg, b.x, b.y, BIG_ONIGIRI_SIZE, BIG_ONIGIRI_SIZE);
-    // ...（以下略）
-  }
-}
-
-
-// --- ゲーム初期化 ---
 function resetGame() {
   score = 0;
   timer = GAME_TIME;
@@ -185,12 +198,10 @@ function resetGame() {
   timerSpan.textContent = timer;
   kishidaSpawned = 0;
   bigOnigiriSpawned = 0;
-  kishidaSchedule = [];
-  bigOnigiriSchedule = [];
+  
   if (animationId) cancelAnimationFrame(animationId);
   if (timerId) clearTimeout(timerId);
 
-  // 出現タイミングをランダムで決定（秒単位）
   let kishidaTimes = [];
   while (kishidaTimes.length < 6) {
     let t = Math.floor(Math.random() * GAME_TIME);
@@ -206,7 +217,6 @@ function resetGame() {
   bigOnigiriSchedule = bigOnigiriTimes.sort((a, b) => a - b);
 }
 
-// --- onigiri吐き出しアニメーション ---
 function startSpitAnimation() {
   const spitCount = 10;
   const spitArray = [];
@@ -224,18 +234,15 @@ function startSpitAnimation() {
   spitAnimations.push(spitArray);
 }
 
-// --- ゲームループ ---
 function gameLoop() {
   if (!isGameRunning) return;
- 
-  // 背景画像を描画
+
   if (bgLoaded) {
     ctx.drawImage(bgImg, 0, 0, GAME_WIDTH, GAME_HEIGHT);
   } else {
     ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
   }
 
-  // --- onigiri描画・移動 ---
   for (let i = 0; i < onigiris.length; i++) {
     const oni = onigiris[i];
     if (!oni.caught) {
@@ -255,7 +262,6 @@ function gameLoop() {
     }
   }
 
-  // --- kishida描画・移動 ---
   for (let i = 0; i < kishidas.length; i++) {
     const k = kishidas[i];
     if (!k.touched) {
@@ -277,30 +283,27 @@ function gameLoop() {
     }
   }
 
-// --- 大きいonigiri描画・移動 ---
-for (let i = 0; i < bigOnigiris.length; i++) {
-  const b = bigOnigiris[i];
-  if (!b.caught) {
-    b.t += 1;
-    const freq = 0.05 + (b.randomSeed % 0.03);
-    // 軌道にブレを加える
-    b.x += b.dx + Math.sin(b.t * freq + b.randomSeed) * 4;
-    b.y += b.dy + Math.cos(b.t * freq + b.randomSeed) * 4;
-    ctx.drawImage(onigiriImg, b.x, b.y, BIG_ONIGIRI_SIZE, BIG_ONIGIRI_SIZE);
+  for (let i = 0; i < bigOnigiris.length; i++) {
+    const b = bigOnigiris[i];
+    if (!b.caught) {
+      b.t += 1;
+      const freq = 0.05 + (b.randomSeed % 0.03);
+      b.x += b.dx + Math.sin(b.t * freq + b.randomSeed) * 4;
+      b.y += b.dy + Math.cos(b.t * freq + b.randomSeed) * 4;
+      ctx.drawImage(onigiriImg, b.x, b.y, BIG_ONIGIRI_SIZE, BIG_ONIGIRI_SIZE);
 
-    const dist = Math.hypot(
-      (b.x + BIG_ONIGIRI_SIZE / 2) - ishibaX,
-      (b.y + BIG_ONIGIRI_SIZE / 2) - ishibaY
-    );
-    if (dist < (ISHIBA_SIZE / 2 + BIG_ONIGIRI_SIZE / 2) * 0.7) {
-      b.caught = true;
-      score += 5;
-      scoreSpan.textContent = score;
+      const dist = Math.hypot(
+        (b.x + BIG_ONIGIRI_SIZE / 2) - ishibaX,
+        (b.y + BIG_ONIGIRI_SIZE / 2) - ishibaY
+      );
+      if (dist < (ISHIBA_SIZE / 2 + BIG_ONIGIRI_SIZE / 2) * 0.7) {
+        b.caught = true;
+        score += 5;
+        scoreSpan.textContent = score;
+      }
     }
   }
-}
 
-  // --- ishiba描画 ---
   ctx.drawImage(
     ishibaImg,
     ishibaX - ISHIBA_SIZE / 2,
@@ -309,7 +312,6 @@ for (let i = 0; i < bigOnigiris.length; i++) {
     ISHIBA_SIZE
   );
 
-  // --- 吐き出しアニメーション ---
   for (let i = spitAnimations.length - 1; i >= 0; i--) {
     const spitArray = spitAnimations[i];
     let allDead = true;
@@ -328,38 +330,20 @@ for (let i = 0; i < bigOnigiris.length; i++) {
     }
   }
 
-  // --- onigiriを一定間隔で発射 ---
   if (Math.random() < 0.03) {
     spawnOnigiri();
-  }
-
-  // --- 石破アイコンの自動移動 ---
-  if (targetX !== null && targetY !== null) {
-    const dx = targetX - ishibaX;
-    const dy = targetY - ishibaY;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist > ISHIBA_MOVE_SPEED) {
-      ishibaX += (dx / dist) * ISHIBA_MOVE_SPEED;
-      ishibaY += (dy / dist) * ISHIBA_MOVE_SPEED;
-    } else {
-      ishibaX = targetX;
-      ishibaY = targetY;
-    }
   }
 
   animationId = requestAnimationFrame(gameLoop);
 }
 
-// --- タイマー管理 ---
 function startTimer() {
   if (!isGameRunning) return;
   if (timer > 0) {
-    // kishida投入
     if (kishidaSchedule.includes(GAME_TIME - timer) && kishidaSpawned < 6) {
       spawnKishida();
       kishidaSpawned++;
     }
-    // 大きいonigiri投入
     if (bigOnigiriSchedule.includes(GAME_TIME - timer) && bigOnigiriSpawned < 3) {
       spawnBigOnigiri();
       bigOnigiriSpawned++;
@@ -376,54 +360,26 @@ function startTimer() {
   }
 }
 
-// --- 石破茂の移動（マウス・タッチ対応、上下左右） ---
-canvas.addEventListener("mousemove", function (e) {
-  if (!isGameRunning) return;
-  const rect = canvas.getBoundingClientRect();
-  ishibaX = e.clientX - rect.left;
-  ishibaY = e.clientY - rect.top;
-});
-canvas.addEventListener("touchmove", function (e) {
+function handlePointerMove(e) {
   if (!isGameRunning) return;
   e.preventDefault();
   const rect = canvas.getBoundingClientRect();
-  const touch = e.touches[0];
-  ishibaX = touch.clientX - rect.left;
-  ishibaY = touch.clientY - rect.top;
-}, { passive: false });
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+  const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+  ishibaX = (clientX - rect.left) * scaleX;
+  ishibaY = (clientY - rect.top) * scaleY;
+}
 
-canvas.addEventListener("touchend", function (e) {
-  targetX = null;
-  targetY = null;
-}, { passive: false });
+canvas.addEventListener("mousemove", handlePointerMove);
+canvas.addEventListener("touchmove", handlePointerMove, { passive: false });
+canvas.addEventListener("touchstart", handlePointerMove, { passive: false });
 
-// --- スタートボタン ---
-startBtn.addEventListener("click", function () {
+startBtn.addEventListener("click", function() {
   resetGame();
   isGameRunning = true;
   startBtn.disabled = true;
   gameLoop();
   startTimer();
 });
-
-function resizeCanvasAndTitle() {
-  const parent = canvas.parentElement;
-  const parentWidth = parent.offsetWidth;
-  const h1 = document.getElementById('game-title');
-  // タイトルのフォントサイズを親要素の幅に応じて設定
-  h1.style.fontSize = Math.max(20, Math.min(parentWidth * 0.08, 32)) + "px";
-
-  // 幅を基準に高さを決める（1:1.1でかなり低めに）
-  let canvasWidth = Math.min(parentWidth, 400);
-  let canvasHeight = canvasWidth * 1.1;
-  canvas.width = canvasWidth;
-  canvas.height = canvasHeight;
-  canvas.style.width = canvasWidth + "px";
-  canvas.style.height = canvasHeight + "px";
-}
-window.addEventListener('resize', resizeCanvasAndTitle);
-resizeCanvasAndTitle();
-
-let targetX = null;
-let targetY = null;
-const ISHIBA_MOVE_SPEED = 8; // 1フレームあたりの最大移動量（調整可）
