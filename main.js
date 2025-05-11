@@ -48,16 +48,25 @@ function initializeGameDimensions() {
   const canvasStyleWidth = canvas.clientWidth;
   const canvasStyleHeight = canvas.clientHeight;
 
+  // デバイスピクセル比を取得
+  const dpr = window.devicePixelRatio || 1;
+
   GAME_WIDTH = canvasStyleWidth;
   GAME_HEIGHT = canvasStyleHeight;
 
-  canvas.width = GAME_WIDTH;
-  canvas.height = GAME_HEIGHT;
+  // ピクセル密度を上げる
+  canvas.width = GAME_WIDTH * dpr;
+  canvas.height = GAME_HEIGHT * dpr;
+  canvas.style.width = GAME_WIDTH + "px";
+  canvas.style.height = GAME_HEIGHT + "px";
+  ctx.setTransform(1, 0, 0, 1, 0, 0); // リセット
+  ctx.scale(dpr, dpr);
 
-  ISHIBA_SIZE = Math.min(GAME_WIDTH, GAME_HEIGHT) * 0.15;
-  ONIGIRI_SIZE = ISHIBA_SIZE * 0.4;
+  // 画像サイズを2倍に
+  ISHIBA_SIZE = Math.min(GAME_WIDTH, GAME_HEIGHT) * 0.30; // ←0.15→0.30
+  ONIGIRI_SIZE = ISHIBA_SIZE * 0.8; // ←0.4→0.8
   BIG_ONIGIRI_SIZE = ONIGIRI_SIZE * 3;
-  KISHIDA_SIZE = ISHIBA_SIZE * 0.9;
+  KISHIDA_SIZE = ISHIBA_SIZE * 1.8; // ←0.9→1.8
 
   ishibaX = GAME_WIDTH / 2;
   ishibaY = GAME_HEIGHT - ISHIBA_SIZE / 2 - 10;
