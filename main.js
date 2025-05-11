@@ -62,11 +62,11 @@ function initializeGameDimensions() {
   ctx.setTransform(1, 0, 0, 1, 0, 0); // リセット
   ctx.scale(dpr, dpr);
 
-  // 画像サイズを2倍に
-  ISHIBA_SIZE = Math.min(GAME_WIDTH, GAME_HEIGHT) * 0.30; // ←0.15→0.30
-  ONIGIRI_SIZE = ISHIBA_SIZE * 0.8; // ←0.4→0.8
+  // 画像サイズを1倍（元の2倍→1倍に戻す）
+  ISHIBA_SIZE = Math.min(GAME_WIDTH, GAME_HEIGHT) * 0.15; // 0.30 → 0.15
+  ONIGIRI_SIZE = ISHIBA_SIZE * 0.4; // 0.8 → 0.4
   BIG_ONIGIRI_SIZE = ONIGIRI_SIZE * 3;
-  KISHIDA_SIZE = ISHIBA_SIZE * 1.8; // ←0.9→1.8
+  KISHIDA_SIZE = ISHIBA_SIZE * 0.9; // 1.8 → 0.9
 
   ishibaX = GAME_WIDTH / 2;
   ishibaY = GAME_HEIGHT - ISHIBA_SIZE / 2 - 10;
