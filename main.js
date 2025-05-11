@@ -32,7 +32,7 @@ const ISHIBA_MOVE_SPEED = 8; // お好みで調整
 
 // 画像の設定
 const bgImg = new Image();
-bgImg.src = "background.jpg";
+bgImg.src = "background.png";
 
 const ishibaImg = new Image();
 ishibaImg.src = "ishiba.png";
