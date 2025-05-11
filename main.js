@@ -26,6 +26,10 @@ let bigOnigiriSpawned = 0;
 let kishidaSchedule = [];
 let bigOnigiriSchedule = [];
 
+let targetX = null;
+let targetY = null;
+const ISHIBA_MOVE_SPEED = 8; // お好みで調整
+
 // 画像の設定
 const bgImg = new Image();
 bgImg.src = "background.jpg";
@@ -41,17 +45,11 @@ kishidaImg.src = "kishida.png";
 
 function initializeGameDimensions() {
   const container = document.getElementById("game-area");
-  const containerWidth = container.clientWidth - 20;
-  const containerHeight = container.clientHeight - document.getElementById("game-ui").clientHeight - 20;
-  
-  const aspectRatio = 16/9;
-  if (containerWidth / containerHeight > aspectRatio) {
-    GAME_HEIGHT = containerHeight;
-    GAME_WIDTH = GAME_HEIGHT * aspectRatio;
-  } else {
-    GAME_WIDTH = containerWidth;
-    GAME_HEIGHT = GAME_WIDTH / aspectRatio;
-  }
+  const canvasStyleWidth = canvas.clientWidth;
+  const canvasStyleHeight = canvas.clientHeight;
+
+  GAME_WIDTH = canvasStyleWidth;
+  GAME_HEIGHT = canvasStyleHeight;
 
   canvas.width = GAME_WIDTH;
   canvas.height = GAME_HEIGHT;
@@ -334,6 +332,23 @@ function gameLoop() {
     spawnOnigiri();
   }
 
+  // --- ishibaアイコンの自動移動 ---
+  if (targetX !== null && targetY !== null) {
+    const dx = targetX - ishibaX;
+    const dy = targetY - ishibaY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > ISHIBA_MOVE_SPEED) {
+      ishibaX += (dx / dist) * ISHIBA_MOVE_SPEED;
+      ishibaY += (dy / dist) * ISHIBA_MOVE_SPEED;
+    } else {
+      ishibaX = targetX;
+      ishibaY = targetY;
+      // 目標に到達したら止める
+      targetX = null;
+      targetY = null;
+    }
+  }
+
   animationId = requestAnimationFrame(gameLoop);
 }
 
@@ -360,21 +375,19 @@ function startTimer() {
   }
 }
 
-function handlePointerMove(e) {
-  if (!isGameRunning) return;
+function handlePointerDown(e) {
   e.preventDefault();
   const rect = canvas.getBoundingClientRect();
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
-  const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-  const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-  ishibaX = (clientX - rect.left) * scaleX;
-  ishibaY = (clientY - rect.top) * scaleY;
+  const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+  const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+  targetX = (clientX - rect.left) * scaleX;
+  targetY = (clientY - rect.top) * scaleY;
 }
 
-canvas.addEventListener("mousemove", handlePointerMove);
-canvas.addEventListener("touchmove", handlePointerMove, { passive: false });
-canvas.addEventListener("touchstart", handlePointerMove, { passive: false });
+canvas.addEventListener("mousedown", handlePointerDown);
+canvas.addEventListener("touchstart", handlePointerDown, { passive: false });
 
 startBtn.addEventListener("click", function() {
   resetGame();
